@@ -20,6 +20,8 @@ from shutil import copyfile
 
 from BaselModel.basel_model import *
 
+torch.backends.cudnn.enabled = True
+
 
 def load_model(opt):
     opt.output_audio_expressions = True
@@ -88,7 +90,7 @@ if __name__ == '__main__':
 
     # # load face model
     # morphable_model = MorphableModel()
-    # mask = morphable_model.LoadMask()
+    # mask = _model.LoadMask()
     # mask = mask + 0.1 * torch.ones_like(mask)
 
     # read target sequence

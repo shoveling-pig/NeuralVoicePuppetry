@@ -1,6 +1,6 @@
-set -ex
+# set -ex
 # . transfer.sh &
-GPUID=0
+GPUID=7
 
 ######################################################
 ##################   SPECIFY MODEL  ##################
@@ -14,7 +14,7 @@ N_ITER=150
 N_ITER_LR_DECAY=50
 RENDERER=$OBJECT
 EROSION=1.0
-BATCH_SIZE=16
+BATCH_SIZE=1
 MODEL=audio2ExpressionsAttentionTMP4
 RENDERER_TYPE=estimatorAttention
 DATASET_MODE=multi_face_audio_eq_tmp_cached

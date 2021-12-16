@@ -19,7 +19,7 @@ class MorphableModel(nn.Module):
         if filename_average=='':
             print('use default identity')
             filename_mesh = './BaselModel/average.obj'
-        mesh = sr.Mesh.from_obj(filename_mesh, normalization=False, load_texture=True)
+        mesh = sr.Mesh.from_obj(filename_mesh, normalization=False, load_texture=False)
         self.average_vertices = mesh.vertices[0]
         self.faces = mesh.faces[0]
         self.average_vertices = self.average_vertices[None, :, :]  # [num_vertices, XYZ] -> [batch_size=1, num_vertices, XYZ]
@@ -32,11 +32,10 @@ class MorphableModel(nn.Module):
         print('faces:', self.faces.shape)
 
         ## basis function
-        self.expression_basis = np.memmap('./BaselModel/ExpressionBasis.matrix', dtype='float32', mode='r').__array__()[1:] # first entry is the size
-        self.expression_basis = np.resize(self.expression_basis,  (N_EXPRESSIONS, self.num_vertices, 4))[:,:,0:3]
-        self.expression_basis = torch.tensor(self.expression_basis.astype(np.float32)).cuda() # N_EXPRESSIONS x num_vertices x 3
-        self.expression_basis = torch.transpose(self.expression_basis,0,2) # transpose for matmul
-        print('expression_basis', self.expression_basis.shape)
+        self.expression_basis = np.load('/data3/shovelingpig/STV/NeuralVoicePuppetry/Audio2ExpressionNet/Training Code/BaselModel/ExpressionBasis.npy')
+        self.expression_basis = np.reshape(self.expression_basis,  (self.num_vertices, 3, N_EXPRESSIONS))
+        self.expression_basis = torch.tensor(self.expression_basis.astype(np.float32)).cuda() 
+        self.expression_basis = torch.transpose(self.expression_basis, 0, 1) # 3 x num_vertices x N_EXPRESSIONS
 
 
         #texture_size = 2
@@ -81,7 +80,7 @@ class MorphableModel(nn.Module):
         f.close()
 
     def compute_expression_delta(self, expressions):
-        return torch.transpose(torch.matmul(self.expression_basis, torch.transpose(expressions, 0,1)), 0, 2) # note that matmul wants to have this order:  (a x b x c) x (c x m) => (a x b x m)
+        return torch.transpose(torch.matmul(self.expression_basis, torch.transpose(expressions, 0, 1)), 0, 2) # note that matmul wants to have this order:  (a x b x c) x (c x m) => (a x b x m)
 
     def morph(self, expressions):
         self.vertices = self.average_vertices + self.compute_expression_delta(expressions)

@@ -1,6 +1,6 @@
-set -ex
+# set -ex
 # . train_audio2expressionsAttentionTMP.sh &
-GPUID=0
+GPUID=7
 DATASETS_DIR=./datasets
 DATASET_MODE=multi_face_audio_eq_tmp_cached
 OBJECT=ARD_ZDF
@@ -30,7 +30,7 @@ LR=0.0001
 N_ITER=20 #50 #N_ITER=150
 N_ITER_LR_DECAY=30
 
-BATCH_SIZE=16
+BATCH_SIZE=8
 SEQ_LEN=8
 
 
